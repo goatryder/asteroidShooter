@@ -4,9 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-
-#include "Engine/Engine.h"
-
 #include "Laser.generated.h"
 
 UCLASS()
@@ -14,6 +11,12 @@ class ASTEROIDSHOOTER_API ALaser : public AActor
 {
 	GENERATED_BODY()
 	
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* LaserMesh;
+
+	UPROPERTY(EditAnywhere)
+	class UAudioComponent* Sound;
+
 public:	
 	// Sets default values for this actor's properties
 	ALaser();
@@ -41,12 +44,6 @@ private:
 	float TimeElapsed;
 
 public:
-
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* LaserMesh;
-
-	UPROPERTY(EditAnywhere)
-	class UAudioComponent* Sound;
 
 	inline void SetLaunchSpeed(float Input) { LaunchSpeed = Input; }
 

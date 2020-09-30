@@ -11,7 +11,7 @@
 #include "Engine/World.h"
 #include "Engine/StaticMesh.h"
 
-//#include "Laser.h"
+#include "Laser.h"
 //#include "Asteroid.h"
 
 int ASpaceShipPawn::ShotsFired = 0;
@@ -138,7 +138,7 @@ void ASpaceShipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("Thrust", this, &ASpaceShipPawn::ThrustInput);
 	PlayerInputComponent->BindAxis("CannonUp", this, &ASpaceShipPawn::RotateCannonUp);
 	PlayerInputComponent->BindAxis("CannonRight", this, &ASpaceShipPawn::RotateCannonRight);
-	PlayerInputComponent->BindAxis("FireCannon", this, &ASpaceShipPawn::FireCannon);
+	PlayerInputComponent->BindAxis("Fire", this, &ASpaceShipPawn::FireCannon);
 
 }
 
@@ -172,6 +172,37 @@ void ASpaceShipPawn::RotateCannonRight(float Value)
 
 void ASpaceShipPawn::FireCannon(float Value)
 {
+
+	// UE_LOG(LogTemp, Warning, TEXT("FireCannon Value: %d"), Value);
+
+	static bool IsPressed = false;
+
+	ALaser* Shot;
+
+	if (Value == 1.0f) {
+
+		if (!IsPressed) {
+
+			Shot = GetWorld()->SpawnActor<ALaser>(
+				Cannon->GetComponentLocation() +
+				Cannon->GetComponentRotation().RotateVector(FVector(700.0f, 0.0f, -75.0f)),
+
+				Cannon->GetComponentRotation());
+
+			Shot->SetActorScale3D(FVector(0.5f, 0.5f, 0.5f));
+			Shot->SetLaunchSpeed(10000.0f);
+
+			IsPressed = true;
+
+			ShotsFired++;
+
+		}
+
+	}
+	else {
+
+		IsPressed = false;
+	}
 }
 
 void ASpaceShipPawn::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)

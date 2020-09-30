@@ -5,8 +5,7 @@
 
 #include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
-// #include "Engine/World.h"
-//#include "Engine/StaticMesh.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 ALaser::ALaser()
@@ -37,13 +36,21 @@ ALaser::ALaser()
 	// add material to mesh
 	UMaterial* TempMaterial = CreateDefaultSubobject<UMaterial>(TEXT("Laser Material"));
 	TempMaterial = ConstructorHelpers::FObjectFinderOptional<UMaterial>(
-		TEXT("/Game/Geometry/Material/LaserMaterial.LaserMaterial")).Get();
+		TEXT("/Game/Geometry/Materials/LaserMaterial.LaserMaterial")).Get();
 	
 	LaserMesh->SetMaterial(int32(), TempMaterial);
 
 	Sound = CreateDefaultSubobject<UAudioComponent>(TEXT("Laser Sound"));
-	// Sound->SetSound(ConstructorStatics.LaserSound.Get());
-	// Sound->Play();
+	Sound->SetSound(ConstructorStatics.LaserSound.Get());
+	Sound->Play();
+
+	// Initial values
+	Direction = FVector(1.0f, 0.0f, 0.0f);
+	LaunchSpeed = 1000.0f;
+	SurvivalTime = 5.0f;
+	TimeElapsed = 0.0f;
+
+	Tags.Add(TEXT("Laser"));
 
 
 } // constructor
@@ -60,10 +67,25 @@ void ALaser::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
+	TimeElapsed += DeltaTime;
+
+	if (TimeElapsed > SurvivalTime)
+		Destroy();
+
+	const FVector LocalMove = Direction * DeltaTime * LaunchSpeed;
+
+	AddActorLocalOffset(LocalMove, true);
+
+} // tick
 
 void ALaser::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, 
 	bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
+
+	if (!Other->ActorHasTag("Player"))
+		Destroy();
+	else
+		AddActorLocalOffset(FVector(10.0f, 0.0f, 0.0f), false);
+
 }
 
