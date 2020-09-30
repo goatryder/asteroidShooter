@@ -150,13 +150,12 @@ void ASpaceShipPawn::ThrustInput(float Value)
 	// slow ship over time
 	FVector SlowedVelocity = LocalVelocity - SlowDown * LocalVelocity / LocalVelocity.GetAbs() * GetWorld()->GetDeltaSeconds();
 
-	if (Dot3(LocalVelocity, SlowedVelocity) > 0)
+	if (Dot3(LocalVelocity, SlowedVelocity) > 0.0f)
 		LocalVelocity = SlowedVelocity;
-	
+
 	LocalVelocity = LocalVelocity + FVector(DeltaV, 0.0f, 0.0f);
 
 }
-
 void ASpaceShipPawn::RotateCannonUp(float Value)
 {
 
