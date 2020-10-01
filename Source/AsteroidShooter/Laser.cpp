@@ -30,7 +30,7 @@ ALaser::ALaser()
 
 	LaserMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Laser Mesh"));
 	LaserMesh->SetStaticMesh(ConstructorStatics.LaserMesh.Get());
-	LaserMesh->SetWorldScale3D(FVector(0.5f, 0.5f, 0.5f));
+	LaserMesh->SetWorldScale3D(FVector(0.5f));
 	RootComponent = LaserMesh;
 
 	// add material to mesh
@@ -46,7 +46,7 @@ ALaser::ALaser()
 
 	// Initial values
 	Direction = FVector(1.0f, 0.0f, 0.0f);
-	LaunchSpeed = 1000.0f;
+	LaunchSpeed = 10000.0f;
 	SurvivalTime = 5.0f;
 	TimeElapsed = 0.0f;
 

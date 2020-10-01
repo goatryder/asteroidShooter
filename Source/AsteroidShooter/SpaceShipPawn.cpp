@@ -11,8 +11,8 @@
 #include "Engine/World.h"
 #include "Engine/StaticMesh.h"
 
-#include "Laser.h"
-//#include "Asteroid.h"
+
+#include "Asteroid.h"
 
 int ASpaceShipPawn::ShotsFired = 0;
 
@@ -73,9 +73,12 @@ ASpaceShipPawn::ASpaceShipPawn()
 	TurnSpeed = 100.0f;
 	MaxSpeed = 1000.0f;
 	MinSpeed = 500.0f;
-	LocalVelocity = FVector(0.0, 0.0, 0.0);
+	LocalVelocity = FVector::ZeroVector;
 	SlowDown = 100.0f;
-	BoundaryRadius = 10000;
+
+	Laser = ALaser::StaticClass(); // try set default class for Laser
+
+	BoundaryRadius = 10000; // TEST
 
 
 } // constructor
@@ -120,6 +123,29 @@ void ASpaceShipPawn::Tick(float DeltaTime)
 	Cannon->AddLocalRotation(-1 * DeltaRotation);
 
 	// SPAWN ASTEROIDS
+	if (!(rand() % 100)) {
+	
+		AAsteroid* Temp = GetWorld()->SpawnActor<AAsteroid>();
+
+		Temp->SetSizeCategory(rand() % 4);
+		Temp->SetRandomVelocity();
+
+		Temp->SetActorLocationAndRotation(
+			FVector(rand() % (BoundaryRadius * 2) - BoundaryRadius,
+					rand() % (BoundaryRadius * 2) - BoundaryRadius,
+					rand() % (BoundaryRadius * 2) - BoundaryRadius),
+
+			FRotator(rand() % 360, rand() % 360, rand() % 360),
+
+			false
+		);
+
+		if ((Temp->GetActorLocation() - GetActorLocation()).Size() < 400.0f)
+			Temp->Destroy();
+
+
+
+	}
 
 	LocalVelocity = CheckAndDoBoundaryHit(GetActorLocation(), GetActorRotation().RotateVector(LocalVelocity));
 
@@ -176,6 +202,7 @@ void ASpaceShipPawn::FireCannon(float Value)
 	// UE_LOG(LogTemp, Warning, TEXT("FireCannon Value: %d"), Value);
 
 	static bool IsPressed = false;
+	static bool bShootLeft = false;
 
 	ALaser* Shot;
 
@@ -183,16 +210,25 @@ void ASpaceShipPawn::FireCannon(float Value)
 
 		if (!IsPressed) {
 
-			Shot = GetWorld()->SpawnActor<ALaser>(
-				Cannon->GetComponentLocation() +
-				Cannon->GetComponentRotation().RotateVector(FVector(700.0f, 0.0f, -75.0f)),
+			// LaserBeam Offset left/right
+			float LaserOffsetY = bShootLeft ? 180.0f : -180.0f;
 
+			FVector LaserSpawnLocation = Cannon->GetComponentLocation() +
+				Cannon->GetComponentRotation().RotateVector(FVector(700.0f, 0.0f, -75.0f));
+
+			LaserSpawnLocation.Y += LaserOffsetY;
+
+			Shot = GetWorld()->SpawnActor<ALaser>(
+				Laser,
+				LaserSpawnLocation,
 				Cannon->GetComponentRotation());
 
 			Shot->SetActorScale3D(FVector(0.5f, 0.5f, 0.5f));
-			Shot->SetLaunchSpeed(10000.0f);
+			// Shot->SetLaunchSpeed(10000.0f);
 
 			IsPressed = true;
+
+			bShootLeft = !bShootLeft;
 
 			ShotsFired++;
 

@@ -62,12 +62,14 @@ AAsteroid::AAsteroid()
 	Sound->Deactivate();
 
 	// Initial values
-	MinVelocity = 10;
-	SpeedModifier = 10000;
+	MinVelocity = 10.0f;
+	SpeedModifier = 10000.0f;
 	SizeCategory = 3;
+	
+	AsteroidBoundary = 10000.0f;
 
-	RandomVelocity();
 	SetSizeCategory(SizeCategory);
+	SetRandomVelocity();
 
 } // constructor
 
@@ -85,13 +87,71 @@ void AAsteroid::Tick(float DeltaTime)
 
 	// move asteroid
 	AddActorLocalOffset(DeltaTime * AsteroidVelocity, true);
+	
+	
+	//AsteroidVelocity = CheckAndDoBoundaryHit(
+		//GetActorLocation(), GetActorRotation().RotateVector(AsteroidVelocity));
+
+	// explode if leave boundary
+	//if (GetActorLocation().Size() > AsteroidBoundary)
+	//	Explode();
 
 }
 
 void AAsteroid::Explode()
 {
+	
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound->Sound, GetActorLocation());
+
+	// make particles explode
+	ExplosionParticleComponent->AddLocalOffset(-1 * ExplosionParticleComponent->GetRelativeLocation());
+	ExplosionParticleComponent->ResetParticles(true);
+	ExplosionParticleComponent->Activate(true);
+
+	UGameplayStatics::SpawnEmitterAtLocation(
+		GetWorld(), ExplosionParticleComponent->Template,
+		FTransform(GetActorRotation(), GetActorLocation(), GetActorScale3D())
+	);
+
+	if (SizeCategory > 0) {
+
+		for (int i = 0; i < 4; i++) {
+
+			AAsteroid* Temp = GetWorld()->SpawnActor<AAsteroid>(GetActorLocation(), GetActorRotation() + FRotator(rand() % 360));
+
+			Temp->SetSizeCategory(SizeCategory - 1); // spawn one power smaller asteroid
+
+			Temp->SetRandomVelocity();  // SizeCategory changed, reset velocity
+
+		}
+	
+	}
+
+	Destroy();
+
+	AAsteroid::AsteroidScore++;
+
 }
 
 void AAsteroid::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
+
+	if (Other->ActorHasTag("Laser"))
+		Explode();
+
+	else if (Other->ActorHasTag("Asteroid")) {
+
+		if (!isFree)
+			AddActorWorldOffset(AsteroidVelocity * 0.1f, false);
+		else
+			AsteroidVelocity = AsteroidVelocity - 2 * (FVector::DotProduct(HitNormal, AsteroidVelocity)) * HitNormal.Size();
+
+	}
+
+	else {
+
+		AsteroidVelocity = AsteroidVelocity - 2 * (FVector::DotProduct(HitNormal, AsteroidVelocity)) * HitNormal / HitNormal.Size();
+
+	}
+
 }

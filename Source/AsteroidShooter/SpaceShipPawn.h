@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+
+#include "Laser.h"
+
 #include "SpaceShipPawn.generated.h"
 
 UCLASS()
@@ -22,6 +25,10 @@ class ASTEROIDSHOOTER_API ASpaceShipPawn : public APawn
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ALaser> Laser;
+
 
 public:
 	// Sets default values for this pawn's properties
@@ -45,7 +52,16 @@ public:
 	static int ShotsFired;
 
 private:
+	
+	FVector LocalVelocity;
 
+	float CurrentYawSpeed;
+	float CurrentPitchSpeed;
+	float CurrentRollSpeed;
+
+protected:
+
+	UPROPERTY(EditAnywhere)
 	int BoundaryRadius;
 
 	UPROPERTY(EditAnywhere)
@@ -62,14 +78,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float SlowDown;
-
-	FVector LocalVelocity;
-
-	float CurrentYawSpeed;
-	float CurrentPitchSpeed;
-	float CurrentRollSpeed;
-
-protected:
 
 	// check if collision occurs with world boundary or obstacles
 	FVector CheckAndDoBoundaryHit(FVector WorldLocation, FVector Velocity) {

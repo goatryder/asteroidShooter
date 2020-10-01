@@ -41,7 +41,35 @@ public:
 
 	static int AsteroidScore;
 
+	inline void SetSizeCategory(int NewSize) {
+
+		SetActorScale3D(FVector(1 << NewSize));
+
+		SizeCategory = NewSize;
+
+	}
+
+	inline void SetRandomVelocity() {
+
+		AsteroidVelocity = FVector(rand() % 101 - 50, rand() % 101 - 50, rand() % 101 - 50);
+		AsteroidVelocity.Normalize();
+		AsteroidVelocity = (rand() % int(SpeedModifier / SizeCategory - MinVelocity) + 1 + MinVelocity) * AsteroidVelocity;
+
+	}
+
 protected:
+
+	UPROPERTY(EditAnywhere)
+	int SizeCategory;
+
+	UPROPERTY(EditAnywhere)
+	float SpeedModifier;
+
+	UPROPERTY(EditAnywhere)
+	float MinVelocity;
+
+	UPROPERTY(EditAnywhere)
+	float AsteroidBoundary;
 	
 	// check if collision occurs with world boundary or obstacles
 	FVector CheckAndDoBoundaryHit(FVector WorldLocation, FVector PassedVelocity) {
@@ -56,38 +84,10 @@ protected:
 
 private:
 
-	UPROPERTY(EditAnywhere)
-	int SizeCategory;
-
-	UPROPERTY(EditAnywhere)
-	float SpeedModifier;
-
-	UPROPERTY(EditAnywhere)
-	float MinVelocity;
-
 	FVector AsteroidVelocity;
-
-	float AsteroidBoundary;
 
 	bool isFree;
 
-	inline void RandomVelocity() {
-
-		AsteroidVelocity = FVector(rand() % 101 - 50, rand() % 101 - 50, rand() % 101 - 50);
-		AsteroidVelocity.Normalize();
-		AsteroidVelocity = (rand() % int(SpeedModifier / SizeCategory - MinVelocity) + 1 + MinVelocity) * AsteroidVelocity;
-	
-	}
-
-	inline void SetSizeCategory(int NewSize) { 
-
-		SetActorScale3D(FVector(1 << NewSize));
-
-		SizeCategory = NewSize;
-	}
-
 	void Explode();
-	
-
 
 };
