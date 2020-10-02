@@ -29,7 +29,6 @@ class ASTEROIDSHOOTER_API ASpaceShipPawn : public APawn
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ALaser> Laser;
 
-
 public:
 	// Sets default values for this pawn's properties
 	ASpaceShipPawn();

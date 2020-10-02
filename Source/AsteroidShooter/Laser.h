@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+
 #include "Laser.generated.h"
 
 UCLASS()
@@ -11,8 +13,12 @@ class ASTEROIDSHOOTER_API ALaser : public AActor
 {
 	GENERATED_BODY()
 	
+	// Projectile movement component.
+	UPROPERTY(VisibleAnywhere, Category = Movement)
+	UProjectileMovementComponent* ProjectileMovementComponent;
+
 	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* LaserMesh;
+	class UStaticMeshComponent* LaserMesh; 
 
 	UPROPERTY(EditAnywhere)
 	class UAudioComponent* Sound;
@@ -44,6 +50,9 @@ private:
 	float TimeElapsed;
 
 public:
+
+	UFUNCTION()
+	void OnBeginOverlap(AActor* ProjectileActor, AActor* OtherActor);
 
 	inline void SetLaunchSpeed(float Input) { LaunchSpeed = Input; }
 

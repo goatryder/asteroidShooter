@@ -87,7 +87,6 @@ ASpaceShipPawn::ASpaceShipPawn()
 void ASpaceShipPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -143,13 +142,11 @@ void ASpaceShipPawn::Tick(float DeltaTime)
 		if ((Temp->GetActorLocation() - GetActorLocation()).Size() < 400.0f)
 			Temp->Destroy();
 
-
-
 	}
 
-	LocalVelocity = CheckAndDoBoundaryHit(GetActorLocation(), GetActorRotation().RotateVector(LocalVelocity));
+	// LocalVelocity = CheckAndDoBoundaryHit(GetActorLocation(), GetActorRotation().RotateVector(LocalVelocity));
 
-	LocalVelocity = GetActorRotation().UnrotateVector(LocalVelocity);  // inverse rotation
+	// LocalVelocity = GetActorRotation().UnrotateVector(LocalVelocity);  // inverse rotation
 
 } // tick
 
@@ -211,7 +208,7 @@ void ASpaceShipPawn::FireCannon(float Value)
 		if (!IsPressed) {
 
 			// LaserBeam Offset left/right
-			float LaserOffsetY = bShootLeft ? 180.0f : -180.0f;
+			float LaserOffsetY = bShootLeft ? 140.0f : -140.0f;
 
 			FVector LaserSpawnLocation = Cannon->GetComponentLocation() +
 				Cannon->GetComponentRotation().RotateVector(FVector(700.0f, 0.0f, -75.0f));

@@ -44,6 +44,15 @@ ALaser::ALaser()
 	Sound->SetSound(ConstructorStatics.LaserSound.Get());
 	Sound->Play();
 
+	// Use this component to drive this projectile's movement.
+	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	ProjectileMovementComponent->SetUpdatedComponent(RootComponent);
+	ProjectileMovementComponent->InitialSpeed = 3000.0f;
+	ProjectileMovementComponent->MaxSpeed = 3000.0f;
+	ProjectileMovementComponent->bRotationFollowsVelocity = true;
+	ProjectileMovementComponent->bShouldBounce = true;
+	ProjectileMovementComponent->Bounciness = 0.3f;
+
 	// Initial values
 	Direction = FVector(1.0f, 0.0f, 0.0f);
 	LaunchSpeed = 10000.0f;
@@ -82,10 +91,17 @@ void ALaser::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveCom
 	bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
 
-	if (!Other->ActorHasTag("Player"))
-		Destroy();
-	else
+	// if (!Other->ActorHasTag("Player"))
+	//	 Destroy();
+	// else
+	//	AddActorLocalOffset(FVector(10.0f, 0.0f, 0.0f), false);
+
+	if (Other->ActorHasTag("Player"))
 		AddActorLocalOffset(FVector(10.0f, 0.0f, 0.0f), false);
 
+}
+
+void ALaser::OnBeginOverlap(AActor* ProjectileActor, AActor* OtherActor)
+{
 }
 
