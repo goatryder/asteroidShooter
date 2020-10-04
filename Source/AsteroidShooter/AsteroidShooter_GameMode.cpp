@@ -12,4 +12,6 @@ AAsteroidShooter_GameMode::AAsteroidShooter_GameMode() {
 	DefaultPawnClass = ASpaceShipPawn::StaticClass();
 	HUDClass = AAsteroid_HUD::StaticClass();
 
+	Asteroids.Init(AAsteroid::StaticClass(), 1);
+
 } // constructor

@@ -11,8 +11,9 @@
 #include "Engine/World.h"
 #include "Engine/StaticMesh.h"
 
+#include "Kismet/GameplayStatics.h"
 
-#include "Asteroid.h"
+#include "AsteroidShooter_GameMode.h"
 
 int ASpaceShipPawn::ShotsFired = 0;
 
@@ -80,7 +81,6 @@ ASpaceShipPawn::ASpaceShipPawn()
 
 	BoundaryRadius = 10000; // TEST
 
-
 } // constructor
 
 // Called when the game starts or when spawned
@@ -122,9 +122,14 @@ void ASpaceShipPawn::Tick(float DeltaTime)
 	Cannon->AddLocalRotation(-1 * DeltaRotation);
 
 	// SPAWN ASTEROIDS
+
 	if (!(rand() % 100)) {
-	
-		AAsteroid* Temp = GetWorld()->SpawnActor<AAsteroid>();
+
+		AAsteroidShooter_GameMode* GameModeREF = Cast<AAsteroidShooter_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		TArray<TSubclassOf<AAsteroid>>Asteroids = GameModeREF->Asteroids;
+		TSubclassOf<AAsteroid> AsteroidClass = Asteroids[rand() % Asteroids.Num()]; // Get random asteroid class
+
+		AAsteroid* Temp = GetWorld()->SpawnActor<AAsteroid>(AsteroidClass);
 
 		Temp->SetSizeCategory(rand() % 4);
 		Temp->SetRandomVelocity();
@@ -211,7 +216,10 @@ void ASpaceShipPawn::FireCannon(float Value)
 			float LaserOffsetY = bShootLeft ? 140.0f : -140.0f;
 
 			FVector LaserSpawnLocation = Cannon->GetComponentLocation() +
-				Cannon->GetComponentRotation().RotateVector(FVector(700.0f, 0.0f, -75.0f));
+			Cannon->GetComponentRotation().RotateVector(FVector(700.0f, 0.0f, -75.0f));
+
+			//UE_LOG(LogTemp, Warning, TEXT("Cannon Location %s Cannon Rotation Value: %s"), 
+			//	*Cannon->GetComponentLocation().ToString(), *Cannon->GetComponentRotation().ToString() );
 
 			LaserSpawnLocation.Y += LaserOffsetY;
 

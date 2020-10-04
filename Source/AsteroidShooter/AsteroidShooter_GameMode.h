@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 
 #include "SpaceShipPawn.h"
+#include "Asteroid.h"
 
 #include "AsteroidShooter_GameMode.generated.h"
 
@@ -23,4 +24,8 @@ public:
 	// Sets default values for this pawn's properties
 	AAsteroidShooter_GameMode();
 	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TSubclassOf<AAsteroid>> Asteroids;
+
 };

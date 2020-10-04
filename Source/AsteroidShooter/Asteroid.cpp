@@ -14,6 +14,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "AsteroidShooter_GameMode.h"
+
 // #include "ParticleHelper.h"
 // #include "Particles/ParticleSystem.h"
 
@@ -66,7 +68,7 @@ AAsteroid::AAsteroid()
 	SpeedModifier = 10000.0f;
 	SizeCategory = 3;
 	
-	AsteroidBoundary = 10000.0f;
+	AsteroidBoundary = 50000.0f;
 
 	SetSizeCategory(SizeCategory);
 	SetRandomVelocity();
@@ -93,8 +95,8 @@ void AAsteroid::Tick(float DeltaTime)
 		//GetActorLocation(), GetActorRotation().RotateVector(AsteroidVelocity));
 
 	// explode if leave boundary
-	//if (GetActorLocation().Size() > AsteroidBoundary)
-	//	Explode();
+	if (GetActorLocation().Size() > AsteroidBoundary)
+		Explode();
 
 }
 
@@ -115,9 +117,13 @@ void AAsteroid::Explode()
 
 	if (SizeCategory > 0) {
 
+		AAsteroidShooter_GameMode* GameModeREF = Cast<AAsteroidShooter_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		TArray<TSubclassOf<AAsteroid>>Asteroids = GameModeREF->Asteroids;
+		TSubclassOf<AAsteroid> AsteroidClass = Asteroids[rand() % Asteroids.Num()]; // Get random asteroid class
+
 		for (int i = 0; i < 4; i++) {
 
-			AAsteroid* Temp = GetWorld()->SpawnActor<AAsteroid>(GetActorLocation(), GetActorRotation() + FRotator(rand() % 360));
+			AAsteroid* Temp = GetWorld()->SpawnActor<AAsteroid>(AsteroidClass, GetActorLocation(), GetActorRotation() + FRotator(rand() % 360));
 
 			Temp->SetSizeCategory(SizeCategory - 1); // spawn one power smaller asteroid
 
